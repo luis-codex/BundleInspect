@@ -1,7 +1,7 @@
 package main
 
 import (
-	"infoBuild/cmd"
+	"BundleInspect/cmd"
 )
 
 func main() {

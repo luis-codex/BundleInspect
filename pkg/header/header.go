@@ -3,7 +3,7 @@ package header
 import (
 	"fmt"
 
-	"infoBuild/pkg/styles"
+	"BundleInspect/pkg/styles"
 
 	"github.com/charmbracelet/lipgloss"
 )

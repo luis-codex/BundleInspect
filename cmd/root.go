@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	services "infoBuild/pkg/controllers"
-	"infoBuild/pkg/header"
-	"infoBuild/pkg/styles"
-	"infoBuild/utils"
+	services "BundleInspect/pkg/controllers"
+	"BundleInspect/pkg/header"
+	"BundleInspect/pkg/styles"
+	"BundleInspect/utils"
 	"os"
 	"sync"
 	"time"

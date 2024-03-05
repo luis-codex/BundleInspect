@@ -3,9 +3,9 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"infoBuild/models"
-	"infoBuild/pkg/styles"
-	"infoBuild/utils"
+	"BundleInspect/models"
+	"BundleInspect/pkg/styles"
+	"BundleInspect/utils"
 	"io"
 	"net/http"
 	"sync"

@@ -13,6 +13,6 @@ type Data struct {
 	Gzip    int    `json:"gzip"`
 	Size    int    `json:"size"`
 	Version string `json:"version"`
-	Name  string `json:"name"`
-	Error *Error `json:"error"`
+	Name    string `json:"name"`
+	Error   *Error `json:"error"`
 }
