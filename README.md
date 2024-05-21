@@ -32,19 +32,6 @@ Para instalar BundleInspect desde el código fuente, sigue estos pasos:
 
     ./BundleInspect <nombre del paquete>
 
-### 2. Descarga del Binario Compilado
-
-Puedes descargar la versión compilada de BundleInspect desde el siguiente enlace: [Descargar BundleInspect](https://github.com/luis-tenorio-code/BundleInspect/raw/main/infoBuild)
-
-2.1. Después de la descarga, puedes ejecutar la aplicación directamente desde la línea de comandos:
-  **Nota:** Asegúrate de tener permisos de ejecución para el archivo descargado:
-
-    chmod +x BundleInspect
-    
-Reemplaza `<nombre del paquete>` con el nombre del paquete que deseas analizar.
-
-    ./BundleInspect <nombre del paquete>
-
 ## Licencia
 
 Este proyecto está bajo la licencia [MIT](LICENSE).
