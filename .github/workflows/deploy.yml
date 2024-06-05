@@ -1,0 +1,109 @@
+name: Go Build and Release
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - 'v*.*.*'  # Se ejecuta cuando se hace push a un tag con versión, por ejemplo, v1.0.0
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        include:
+          - os: windows-latest
+            GOOS: windows
+            GOARCH: amd64
+            EXT: .exe
+          - os: ubuntu-latest
+            GOOS: linux
+            GOARCH: amd64
+            EXT: ''
+          - os: macos-latest
+            GOOS: darwin
+            GOARCH: amd64
+            EXT: ''
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Build
+      run: |
+        GOOS=${{ matrix.GOOS }} GOARCH=${{ matrix.GOARCH }} go build -o cli${{ matrix.EXT }}
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: cli-${{ matrix.os }}
+        path: cli${{ matrix.EXT }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Windows CLI
+      uses: actions/download-artifact@v3
+      with:
+        name: cli-windows-latest
+        path: ./windows
+    - name: Download Linux CLI
+      uses: actions/download-artifact@v3
+      with:
+        name: cli-ubuntu-latest
+        path: ./linux
+    - name: Download Mac CLI
+      uses: actions/download-artifact@v3
+      with:
+        name: cli-macos-latest
+        path: ./macos
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Windows CLI
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./windows/cli.exe
+        asset_name: cli-windows.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload Linux CLI
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./linux/cli
+        asset_name: cli-linux
+        asset_content_type: application/octet-stream
+
+    - name: Upload Mac CLI
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./macos/cli
+        asset_name: cli-macos
+        asset_content_type: application/octet-stream

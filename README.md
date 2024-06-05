@@ -34,4 +34,4 @@ Para instalar BundleInspect desde el código fuente, sigue estos pasos:
 
 ## Licencia
 
-Este proyecto está bajo la licencia [MIT](LICENSE).
+Este proyecto está bajo la licencia [MIT](LICENSE)
