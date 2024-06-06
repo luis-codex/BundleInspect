@@ -30,6 +30,15 @@ jobs:
       - name: List files after builds
         run: ls -l
 
+      - name: Upload Build Artifacts # Paso para subir los binarios como artefactos
+        uses: actions/upload-artifact@v2
+        with:
+          name: cli-binaries
+          path: |
+            ./cli-linux
+            ./cli-mac
+            ./cli-windows.exe
+
   release:
     needs: build # Este trabajo depende del trabajo de compilación
     runs-on: ubuntu-latest # Usar Ubuntu como entorno de ejecución para el lanzamiento
@@ -37,6 +46,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Download Build Artifacts # Paso para descargar los artefactos del trabajo de build
+        uses: actions/download-artifact@v2
+        with:
+          name: cli-binaries
+          path: .
 
       - name: Create or Update Release # Paso para crear o actualizar un release en GitHub
         id: create_release
@@ -48,6 +63,7 @@ jobs:
           release_name: Release ${{ github.ref }} # Nombre del release
           draft: false # Indica si el release es un borrador
           prerelease: false # Indica si el release es una versión preliminar
+          overwrite: true # Permitir actualizar un release existente
 
       - name: Upload Windows CLI # Paso para subir el ejecutable de Windows como activo del release
         uses: actions/upload-release-asset@v1
