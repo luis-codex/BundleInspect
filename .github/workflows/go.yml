@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - '*' # Ejecutar el flujo de trabajo en cada push que incluya un tag
+  workflow_dispatch: # Permitir ejecución manual
 
 jobs:
   build:
@@ -27,11 +28,17 @@ jobs:
       - name: Build for Windows # Paso para compilar el proyecto para Windows
         run: GOOS=windows GOARCH=amd64 go build -o cli-windows.exe
 
+      - name: List files after builds
+        run: ls -l
+
   release:
     needs: build # Este trabajo depende del trabajo de compilación
     runs-on: ubuntu-latest # Usar Ubuntu como entorno de ejecución para el lanzamiento
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Create Release # Paso para crear un nuevo release en GitHub
         id: create_release
         uses: actions/create-release@v1
@@ -69,6 +76,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # URL de carga del release
-          asset_path: ./cli-mac #  Ruta del ejecutable de macOS
+          asset_path: ./cli-mac # Ruta del ejecutable de macOS
           asset_name: cli-mac # Nombre del activo en el release
           asset_content_type: application/octet-stream # Tipo de contenido del activo
