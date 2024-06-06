@@ -69,6 +69,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # URL de carga del release
-          asset_path: ./cli-mac # Ruta del ejecutable de macOS
+          asset_path: ./cli-mac #  Ruta del ejecutable de macOS
           asset_name: cli-mac # Nombre del activo en el release
           asset_content_type: application/octet-stream # Tipo de contenido del activo
