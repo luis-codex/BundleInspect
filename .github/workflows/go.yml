@@ -19,7 +19,8 @@ jobs:
           go-version: '1.x' # Versión de Go a usar
 
       - name: Build for Linux # Paso para compilar el proyecto para Linux
-        run: GOOS=linux GOARCH=amd64 go build -o cli-linux
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags 'osusergo netgo' -ldflags '-extldflags "-static"' -o cli-linux
 
       - name: Build for Mac # Paso para compilar el proyecto para macOS
         run: GOOS=darwin GOARCH=amd64 go build -o cli-mac
@@ -63,7 +64,7 @@ jobs:
           release_name: Release ${{ github.ref }} # Nombre del release
           draft: false # Indica si el release es un borrador
           prerelease: false # Indica si el release es una versión preliminar
-          overwrite: true # Permitir actualizar un release existente
+          # overwrite: true # Permitir actualizar un release existente
 
       - name: Upload Windows CLI # Paso para subir el ejecutable de Windows como activo del release
         uses: actions/upload-release-asset@v1
