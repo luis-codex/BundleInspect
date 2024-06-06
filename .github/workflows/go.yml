@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - '*' # Ejecutar el flujo de trabajo en cada push que incluya un tag
-  workflow_dispatch: # Permitir ejecución manual
 
 jobs:
   build:
@@ -39,7 +38,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Create Release # Paso para crear un nuevo release en GitHub
+      - name: Create or Update Release # Paso para crear o actualizar un release en GitHub
         id: create_release
         uses: actions/create-release@v1
         env:
