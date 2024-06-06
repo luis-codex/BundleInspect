@@ -1,49 +1,74 @@
-name: Build
+name: CI # Nombre del flujo de trabajo en GitHub Actions
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    tags:
+      - '*' # Ejecutar el flujo de trabajo en cada push que incluya un tag
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Usar Ubuntu como entorno de ejecución
 
     steps:
-      - name: Checkout code
+      - name: Checkout code # Paso para obtener el código fuente del repositorio
         uses: actions/checkout@v2
 
-      - name: Set up Go
+      - name: Set up Go # Paso para configurar Go en el entorno de ejecución
         uses: actions/setup-go@v2
         with:
-          go-version: '1.x'
+          go-version: '1.x' # Versión de Go a usar
 
-      - name: Build for Linux
+      - name: Build for Linux # Paso para compilar el proyecto para Linux
         run: GOOS=linux GOARCH=amd64 go build -o cli-linux
 
-      - name: Build for Mac
+      - name: Build for Mac # Paso para compilar el proyecto para macOS
         run: GOOS=darwin GOARCH=amd64 go build -o cli-mac
 
-      - name: Build for Windows
+      - name: Build for Windows # Paso para compilar el proyecto para Windows
         run: GOOS=windows GOARCH=amd64 go build -o cli-windows.exe
 
-      - name: Create Release Directory
-        run: mkdir release
+  release:
+    needs: build # Este trabajo depende del trabajo de compilación
+    runs-on: ubuntu-latest # Usar Ubuntu como entorno de ejecución para el lanzamiento
 
-      - name: Move Linux Executable
-        run: mv cli-linux release/
-
-      - name: Move Mac Executable
-        run: mv cli-mac release/
-
-      - name: Move Windows Executable
-        run: mv cli-windows.exe release/
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+    steps:
+      - name: Create Release # Paso para crear un nuevo release en GitHub
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Token de acceso personal de GitHub
         with:
-          name: cli-binaries
-          path: release/
+          tag_name: ${{ github.ref }} # Nombre del tag asociado al release
+          release_name: Release ${{ github.ref }} # Nombre del release
+          draft: false # Indica si el release es un borrador
+          prerelease: false # Indica si el release es una versión preliminar
+
+      - name: Upload Windows CLI # Paso para subir el ejecutable de Windows como activo del release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # URL de carga del release
+          asset_path: ./cli-windows.exe # Ruta del ejecutable de Windows
+          asset_name: cli-windows.exe # Nombre del activo en el release
+          asset_content_type: application/octet-stream # Tipo de contenido del activo
+
+      - name: Upload Linux CLI # Paso para subir el ejecutable de Linux como activo del release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # URL de carga del release
+          asset_path: ./cli-linux # Ruta del ejecutable de Linux
+          asset_name: cli-linux # Nombre del activo en el release
+          asset_content_type: application/octet-stream # Tipo de contenido del activo
+
+      - name: Upload Mac CLI # Paso para subir el ejecutable de macOS como activo del release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # URL de carga del release
+          asset_path: ./cli-mac # Ruta del ejecutable de macOS
+          asset_name: cli-mac # Nombre del activo en el release
+          asset_content_type: application/octet-stream # Tipo de contenido del activo
